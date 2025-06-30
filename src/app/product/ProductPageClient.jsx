@@ -18,17 +18,35 @@ export default function ProductPageClient() {
     if (!code) return;
     const fetchProduct = async () => {
       try {
-        const res = await fetch(
-          process.env.NEXT_PUBLIC_API_ENDPOINT + `/items?code=${code}`
-        );
-        if (!res.ok) throw new Error("商品が見つかりません");
+        const apiUrl = process.env.NEXT_PUBLIC_API_ENDPOINT;
+        if (!apiUrl) {
+          throw new Error("APIエンドポイントが設定されていません");
+        }
+        
+        console.log(`商品情報を取得中: ${apiUrl}/items?code=${code}`);
+        
+        const res = await fetch(`${apiUrl}/items?code=${code}`);
+        
+        if (!res.ok) {
+          if (res.status === 404) {
+            throw new Error("商品が見つかりません");
+          } else if (res.status === 503) {
+            throw new Error("データベースサービスが利用できません");
+          } else {
+            throw new Error(`サーバーエラー (${res.status}): ${res.statusText}`);
+          }
+        }
+        
         const data = await res.json();
+        console.log("取得した商品データ:", data);
+        
         if (!data || Object.keys(data).length === 0) {
           throw new Error("商品が見つかりません");
         }
         setProduct(data);
         setError("");
       } catch (e) {
+        console.error("商品取得エラー:", e);
         setError(e.message);
         setProduct(null);
       }

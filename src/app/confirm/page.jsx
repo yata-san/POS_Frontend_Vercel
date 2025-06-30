@@ -1,5 +1,5 @@
 "use client";
-import { useContext, useState, useMemo } from "react";
+import React, { useContext, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 
 const CartContext = global.CartContext || React.createContext({ cart: [], setCart: () => {} });
@@ -26,7 +26,14 @@ export default function ConfirmPage() {
     setIsProcessing(true);
     
     try {
-      const res = await fetch(process.env.NEXT_PUBLIC_API_ENDPOINT + "/purchase", {
+      const apiUrl = process.env.NEXT_PUBLIC_API_ENDPOINT;
+      if (!apiUrl) {
+        throw new Error("APIエンドポイントが設定されていません");
+      }
+      
+      console.log(`購入処理開始: ${apiUrl}/purchase`);
+      
+      const res = await fetch(`${apiUrl}/purchase`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -35,7 +42,9 @@ export default function ConfirmPage() {
           total: calculatedTotal
         })
       });
+      
       if (res.ok) {
+        console.log("購入処理成功");
         // 遷移後にカートをクリアするために、遷移を先に実行
         router.push("/complete");
         // 遷移後にカートをクリア（遷移が完了してからクリアされるため表示に影響しない）
@@ -43,12 +52,15 @@ export default function ConfirmPage() {
           setCart([]);
         }, 100);
       } else {
-        alert("購入処理に失敗しました");
+        const errorText = await res.text();
+        console.error(`購入処理失敗: ${res.status} - ${errorText}`);
+        alert(`購入処理に失敗しました (${res.status}): ${res.statusText}`);
         setIsProcessing(false);
         setFixedTotal(null);
       }
     } catch (error) {
-      alert("購入処理に失敗しました");
+      console.error("購入処理エラー:", error);
+      alert(`購入処理に失敗しました: ${error.message}`);
       setIsProcessing(false);
       setFixedTotal(null);
     }
