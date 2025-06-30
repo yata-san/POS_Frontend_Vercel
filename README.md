@@ -6,18 +6,18 @@ git init
 ## 2. ファイルをステージングエリアに追加
 git add .
 
-## 3. 初期コミットを作成
-git commit -m "Initial commit"
+## 3. コミットを作成
+git commit -m "commit"
 
 ## 4. リモートリポジトリのURLを追加（URLは実際のものに置き換えてください）
-git remote add origin your-repository-url
+git remote set-url origin your-repository-url
 
 ## 5. ローカルのmainブランチをリモートにプッシュ
 git push -u origin main
 
 ## 環境変数備忘
 NODE_ENV:production
-PORT:3000
+NEXT_PUBLIC_API_ENDPOINT:
 
 # Vercelでのデプロイについて
 このプロジェクトはVercelでデプロイされます。
