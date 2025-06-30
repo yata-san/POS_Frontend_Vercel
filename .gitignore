@@ -42,7 +42,6 @@ next-env.d.ts
 *.pyc
 __pycache__/
 *.db
-DigiCertGlobalRootCA.crt.pem
 
 # IDEs and editors
 /.idea
